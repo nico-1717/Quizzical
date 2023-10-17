@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Question from './Question'
 import { nanoid } from 'nanoid'
 import { ACTIONS } from '../App'
 
 
-export default function Game(props) {
+export default function Game({ dispatch, isPlaying }) {
 
-    const [questionsAPI, setQuestionsAPI] = React.useState([])
+    const [countCorrect, setCountCorrect] = useState(0)
+    const [questionsAPI, setQuestionsAPI] = useState([])
     /*
     idQuestion:
     question:
@@ -17,26 +18,29 @@ export default function Game(props) {
     }
     */
 
-    const [countCorrect, setCountCorrect] = React.useState(0)
 
-    React.useEffect(function () {
+    useEffect(function () {
 
         async function getQuestionsAPI() {
-            const res = await fetch(`https://opentdb.com/api.php?amount=5&difficulty=easy&type=multiple`)
-            const data = await res.json()
+            try {
+                const res = await fetch(`https://opentdb.com/api.php?amount=5&difficulty=easy&type=multiple`)
+                const data = await res.json()
 
-            if (data.response_code == 0) {
-                setQuestionsAPI(data.results.map(result => {
-                    return {
-                        idQuestion: nanoid(),
-                        question: result.question,
-                        correctAnswer: result.correct_answer,
-                        answers: createAnswersObject(result.correct_answer, result.incorrect_answers)
-                    }
-                }))
-            }
-            else {
-                console.log("error")
+                if (data.response_code == 0) {
+                    setQuestionsAPI(data.results.map(result => {
+                        return {
+                            idQuestion: nanoid(),
+                            question: result.question,
+                            correctAnswer: result.correct_answer,
+                            answers: createAnswersObject(result.correct_answer, result.incorrect_answers)
+                        }
+                    }))
+                }
+                else {
+                    console.log("error")
+                }
+            } catch (error) {
+                console.error('Error fetching questions:', error);
             }
         }
 
@@ -101,17 +105,17 @@ export default function Game(props) {
             return question.answers.filter(answer => answer.checked)
         })
 
-        props.dispatch({ type: ACTIONS.RESULTS })
+        dispatch({ type: ACTIONS.RESULTS })
 
-        setCountCorrect(function() {
+        setCountCorrect(function () {
             let counter = 0
             userAnswers.map((userAnswer, index) => {
-                if (userAnswer.answer === questionsAPI[index].correctAnswer){
+                if (userAnswer.answer === questionsAPI[index].correctAnswer) {
                     counter++
                 }
             })
             return counter
-    })
+        })
 
     }
 
@@ -123,23 +127,25 @@ export default function Game(props) {
                 question={questionAPI.question}
                 answers={questionAPI.answers}
                 handleClick={handleClick}
-                isPlaying={props.isPlaying}
-                correct={props.isPlaying === ACTIONS.PLAYING ? "" : questionsAPI[index].correctAnswer}
+                isPlaying={isPlaying}
+                correct={isPlaying === ACTIONS.PLAYING ? "" : questionsAPI[index].correctAnswer}
             />
         )
     })
 
     return (
         <div className='game'>
-            <form onSubmit={handleSubmit} className='game--elements'>
-                {questionElements}
-                {props.isPlaying === ACTIONS.PLAYING ?
-                    <button>Check answer</button> :
-                    <div className='playAgain'>
-                        <h1 className='game--h1'>You scored {countCorrect}/{questionsAPI.length} correct answers</h1>
-                        <button type='button' onClick={() => props.dispatch({type: ACTIONS.INTRO})}>Play again</button>
-                    </div>}
-            </form>
+            {questionsAPI.length > 0 ?
+                <form onSubmit={handleSubmit} className='game--elements'>
+                    {questionElements}
+                    {isPlaying === ACTIONS.PLAYING ?
+                        <button>Check answer</button> :
+                        <div className='playAgain'>
+                            <h1 className='game--h1'>You scored {countCorrect}/{questionsAPI.length} correct answers</h1>
+                            <button type='button' onClick={() => dispatch({ type: ACTIONS.INTRO })}>Play again</button>
+                        </div>}
+                </form> :
+                <h1 style={{textAlign: "center"}}>Loading...</h1>}
         </div>
     )
 }

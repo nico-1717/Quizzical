@@ -3,7 +3,7 @@ import he from 'he'
 import { ACTIONS } from '../App'
 
 export default function Question(props) {
-
+    
     const styleChecked = {
         backgroundColor: "#D6DBF5",
         color: "#293264"
@@ -24,21 +24,10 @@ export default function Question(props) {
     }
 
     function getStyle(isChecked, correct, text) {
-        if (isChecked){
-            if(correct === text){
-                return styleCorrect
-            }
-            else{
-                return styleIncorrect
-            }
-        }
-        else {
-            if(text === correct){
-                return styleWasCorrect
-            }
-            else{
-                return styleNeutral
-            }
+        if (isChecked) {
+            return correct === text ? styleCorrect : styleIncorrect;
+        } else {
+            return text === correct ? styleWasCorrect : styleNeutral;
         }
     }
 

@@ -10,20 +10,18 @@ export const ACTIONS = {
   RESULTS: "RESULTS"
 }
 
-function App() {
-
-  function reducer(isPlaying, action) {
-    switch (action.type) {
-      case ACTIONS.INTRO:
-        return ACTIONS.INTRO
-      case ACTIONS.PLAYING:
-        return ACTIONS.PLAYING
-      case ACTIONS.RESULTS:
-        return ACTIONS.RESULTS
-      default:
-        return ACTIONS.INTRO;
-    }
+function reducer(state, action) {
+  switch (action.type) {
+    case ACTIONS.INTRO:
+    case ACTIONS.PLAYING:
+    case ACTIONS.RESULTS:
+      return action.type
+    default:
+      return state;
   }
+}
+
+function App() {
 
   const [isPlaying, dispatch] = React.useReducer(reducer, ACTIONS.INTRO)
 
