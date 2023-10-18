@@ -40,7 +40,7 @@ button:hover {
   height: 100%;
   margin: auto;
   /*disable pull-to-refresh on iPhone*/
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: none;
 }
 
 .intro {
