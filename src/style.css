@@ -7,7 +7,6 @@ body {
   background-color: #F5F7FB;
   color: #293264;
   /*disable pull-to-refresh on iPhone*/
-  overflow: hidden;
   overscroll-behavior: none;
 }
 
